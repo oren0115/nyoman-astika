@@ -8,6 +8,8 @@ const nextConfig = {
       { protocol: "https", hostname: "cdn.jsdelivr.net" },
       { protocol: "https", hostname: "raw.githubusercontent.com" },
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
+      // Vercel Blob storage
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },
   experimental: {
