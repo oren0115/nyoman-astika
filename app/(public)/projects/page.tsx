@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Project } from "@prisma/client";
 import { Suspense } from "react";
 import { ProjectCard } from "@/components/public/ProjectCard";
 import { ProjectCardSkeleton } from "@/components/public/SkeletonCard";
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 async function ProjectsList() {
-  const projects = await getPublishedProjects().catch(() => []);
+  const projects: Project[] = await getPublishedProjects().catch(() => []);
 
   if (projects.length === 0) {
     return (

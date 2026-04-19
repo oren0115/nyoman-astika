@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Project, Post } from "@prisma/client";
 import Link from "next/link";
 import { ArrowRight, GithubLogo, LinkedinLogo } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,9 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [featuredProjects, featuredPosts] = await Promise.all([
-    getFeaturedProjects(3).catch(() => []),
-    getFeaturedPosts(3).catch(() => []),
+  const [featuredProjects, featuredPosts]: [Project[], Post[]] = await Promise.all([
+    getFeaturedProjects(3).catch((): Project[] => []),
+    getFeaturedPosts(3).catch((): Post[] => []),
   ]);
 
   const { author } = siteConfig;

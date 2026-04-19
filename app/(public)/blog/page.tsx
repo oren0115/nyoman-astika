@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Post } from "@prisma/client";
 import { Suspense } from "react";
 import { BlogCard } from "@/components/public/BlogCard";
 import { BlogCardSkeleton } from "@/components/public/SkeletonCard";
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 async function PostsList() {
-  const posts = await getPublishedPosts().catch(() => []);
+  const posts: Post[] = await getPublishedPosts().catch(() => []);
 
   if (posts.length === 0) {
     return (

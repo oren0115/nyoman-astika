@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Experience } from "@prisma/client";
 import Link from "next/link";
 import { Plus, PencilSimple } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ function formatPeriod(start: Date, end: Date | null, current: boolean) {
 }
 
 export default async function AdminExperiencePage() {
-  const experiences = await getExperiences().catch(() => []);
+  const experiences: Experience[] = await getExperiences().catch(() => []);
 
   return (
     <div>

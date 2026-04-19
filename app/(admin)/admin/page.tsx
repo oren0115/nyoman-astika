@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Experience } from "@prisma/client";
 import Link from "next/link";
 import { FolderOpen, Article, Globe, PencilSimple, Plus, Briefcase, EnvelopeSimple } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ export default async function AdminDashboardPage() {
   const [projectsData, postsData, experiences, unreadMessages] = await Promise.all([
     getProjects({ limit: 100 }).catch(() => ({ projects: [], total: 0 })),
     getPosts({ limit: 100 }).catch(() => ({ posts: [], total: 0 })),
-    getExperiences().catch(() => []),
+    getExperiences().catch((): Experience[] => []),
     getUnreadCount().catch(() => 0),
   ]);
 

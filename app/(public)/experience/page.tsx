@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Experience } from "@prisma/client";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExperienceCard } from "@/components/public/ExperienceCard";
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 async function ExperienceList() {
-  const experiences = await getExperiences().catch(() => []);
+  const experiences: Experience[] = await getExperiences().catch(() => []);
 
   if (experiences.length === 0) {
     return (
