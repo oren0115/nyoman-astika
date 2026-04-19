@@ -12,8 +12,13 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000"],
+      allowedOrigins: process.env.NEXT_PUBLIC_APP_URL
+        ? [new URL(process.env.NEXT_PUBLIC_APP_URL).host]
+        : ["localhost:3000"],
     },
+  },
+  turbopack: {
+    root: ".",
   },
 };
 
