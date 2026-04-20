@@ -7,7 +7,7 @@ A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, 
 - **Public portfolio** — home, projects, blog, experience, and contact pages
 - **Admin CMS** — manage projects, posts, experience entries, and contact messages
 - **Rich text editor** — Tiptap-powered editor for blog posts and project content
-- **Image uploads** — Vercel Blob in production, local disk in development
+- **Image uploads** — Cloudinary when configured, otherwise local `public/uploads` in development
 - **Dark / light mode** — system-aware theme toggle
 - **Type-safe** — end-to-end TypeScript with Prisma-generated types
 
@@ -22,7 +22,7 @@ A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, 
 | Styling | Tailwind CSS v4 |
 | UI Components | shadcn/ui + Radix UI |
 | Auth | JWT via `jose` |
-| Storage | Vercel Blob (production) / local (development) |
+| Storage | Cloudinary (when env set) / local `public/uploads` |
 | Fonts | Geist Sans, Geist Mono, JetBrains Mono (self-hosted) |
 | Deployment | Vercel |
 
@@ -137,9 +137,9 @@ Make sure all changes are committed and pushed.
 
 Go to [vercel.com/new](https://vercel.com/new), import your GitHub repository.
 
-### 3. Set up Vercel Blob (image storage)
+### 3. Cloudinary (image storage)
 
-In your Vercel project dashboard → **Storage** → **Create Blob Store** → connect it to your project. The `BLOB_READ_WRITE_TOKEN` env variable is added automatically.
+Create a free account at [cloudinary.com](https://cloudinary.com), open the **Dashboard**, and copy **Cloud name**, **API Key**, and **API Secret** into your Vercel environment variables (see below). Uploaded images are stored under the folder `portfolio/uploads`.
 
 ### 4. Set environment variables
 
@@ -150,7 +150,9 @@ In **Settings → Environment Variables**, add:
 | `DATABASE_URL` | PostgreSQL connection string with `?sslmode=verify-full` |
 | `JWT_SECRET` | Random 32+ character string |
 | `NEXT_PUBLIC_APP_URL` | `https://your-project.vercel.app` |
-| `BLOB_READ_WRITE_TOKEN` | Auto-added by Vercel Blob |
+| `CLOUDINARY_CLOUD_NAME` | From Cloudinary dashboard |
+| `CLOUDINARY_API_KEY` | From Cloudinary dashboard |
+| `CLOUDINARY_API_SECRET` | From Cloudinary dashboard |
 
 ### 5. Deploy
 
