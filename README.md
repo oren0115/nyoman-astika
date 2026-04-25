@@ -7,7 +7,11 @@ A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, 
 - **Public portfolio** — home, projects, blog, experience, and contact pages
 - **Admin CMS** — manage projects, posts, experience entries, and contact messages
 - **Rich text editor** — Tiptap-powered editor for blog posts and project content
+<<<<<<< HEAD
 - **Image uploads** — Cloudinary
+=======
+- **Image uploads** — Cloudinary when configured, otherwise local `public/uploads` in development
+>>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
 - **Dark / light mode** — system-aware theme toggle
 - **Type-safe** — end-to-end TypeScript with Prisma-generated types
 
@@ -22,7 +26,11 @@ A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, 
 | Styling | Tailwind CSS v4 |
 | UI Components | shadcn/ui + Radix UI |
 | Auth | JWT via `jose` |
+<<<<<<< HEAD
 | Storage | Cloudinary |
+=======
+| Storage | Cloudinary (when env set) / local `public/uploads` |
+>>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
 | Fonts | Geist Sans, Geist Mono, JetBrains Mono (self-hosted) |
 | Deployment | Vercel |
 
@@ -142,7 +150,11 @@ Go to [vercel.com/new](https://vercel.com/new), import your GitHub repository.
 
 ### 3. Cloudinary (image storage)
 
+<<<<<<< HEAD
 Create a free account at [cloudinary.com](https://cloudinary.com), then in **Programmable Media** → **Dashboard** copy **API Environment variable** (`CLOUDINARY_URL`) or the separate cloud name, API key, and API secret.
+=======
+Create a free account at [cloudinary.com](https://cloudinary.com), open the **Dashboard**, and copy **Cloud name**, **API Key**, and **API Secret** into your Vercel environment variables (see below). Uploaded images are stored under the folder `portfolio/uploads`.
+>>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
 
 ### 4. Set environment variables
 
@@ -153,7 +165,13 @@ In **Settings → Environment Variables**, add:
 | `DATABASE_URL` | PostgreSQL connection string with `?sslmode=verify-full` |
 | `JWT_SECRET` | Random 32+ character string |
 | `NEXT_PUBLIC_APP_URL` | `https://your-project.vercel.app` |
+<<<<<<< HEAD
 | `CLOUDINARY_URL` | From Cloudinary dashboard (or the three `CLOUDINARY_*` vars) |
+=======
+| `CLOUDINARY_CLOUD_NAME` | From Cloudinary dashboard |
+| `CLOUDINARY_API_KEY` | From Cloudinary dashboard |
+| `CLOUDINARY_API_SECRET` | From Cloudinary dashboard |
+>>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
 
 ### 5. Deploy
 
