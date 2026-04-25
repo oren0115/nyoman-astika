@@ -7,7 +7,7 @@ A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, 
 - **Public portfolio** — home, projects, blog, experience, and contact pages
 - **Admin CMS** — manage projects, posts, experience entries, and contact messages
 - **Rich text editor** — Tiptap-powered editor for blog posts and project content
-- **Image uploads** — Vercel Blob in production, local disk in development
+- **Image uploads** — Cloudinary
 - **Dark / light mode** — system-aware theme toggle
 - **Type-safe** — end-to-end TypeScript with Prisma-generated types
 
@@ -22,7 +22,7 @@ A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, 
 | Styling | Tailwind CSS v4 |
 | UI Components | shadcn/ui + Radix UI |
 | Auth | JWT via `jose` |
-| Storage | Vercel Blob (production) / local (development) |
+| Storage | Cloudinary |
 | Fonts | Geist Sans, Geist Mono, JetBrains Mono (self-hosted) |
 | Deployment | Vercel |
 
@@ -56,7 +56,10 @@ Edit `.env` and fill in the required values:
 DATABASE_URL="postgresql://user:password@localhost:5432/portfolio_db"
 JWT_SECRET="your-random-32-char-secret"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
+CLOUDINARY_URL="cloudinary://API_KEY:API_SECRET@CLOUD_NAME"
 ```
+
+Or set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` instead of `CLOUDINARY_URL`. Get these from the [Cloudinary Console](https://console.cloudinary.com/) → **Dashboard** / **API Keys**.
 
 Generate a secure `JWT_SECRET`:
 ```bash
@@ -137,9 +140,9 @@ Make sure all changes are committed and pushed.
 
 Go to [vercel.com/new](https://vercel.com/new), import your GitHub repository.
 
-### 3. Set up Vercel Blob (image storage)
+### 3. Cloudinary (image storage)
 
-In your Vercel project dashboard → **Storage** → **Create Blob Store** → connect it to your project. The `BLOB_READ_WRITE_TOKEN` env variable is added automatically.
+Create a free account at [cloudinary.com](https://cloudinary.com), then in **Programmable Media** → **Dashboard** copy **API Environment variable** (`CLOUDINARY_URL`) or the separate cloud name, API key, and API secret.
 
 ### 4. Set environment variables
 
@@ -150,7 +153,7 @@ In **Settings → Environment Variables**, add:
 | `DATABASE_URL` | PostgreSQL connection string with `?sslmode=verify-full` |
 | `JWT_SECRET` | Random 32+ character string |
 | `NEXT_PUBLIC_APP_URL` | `https://your-project.vercel.app` |
-| `BLOB_READ_WRITE_TOKEN` | Auto-added by Vercel Blob |
+| `CLOUDINARY_URL` | From Cloudinary dashboard (or the three `CLOUDINARY_*` vars) |
 
 ### 5. Deploy
 
