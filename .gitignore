@@ -18,6 +18,8 @@
 
 # production
 /build
+/prisma/migrations
+/prisma/migrations/migrations_lock.toml
 
 # misc
 .DS_Store

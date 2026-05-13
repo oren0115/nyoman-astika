@@ -1,9 +1,15 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
-import "dotenv/config";
+import { getDatabaseUrl, getPrismaPgPoolConfig } from "@/lib/database-url";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+if (!getDatabaseUrl()) {
+  console.error("DATABASE_URL is missing. Set it in .env before running the seed.");
+  process.exit(1);
+}
+
+const adapter = new PrismaPg(getPrismaPgPoolConfig());
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
