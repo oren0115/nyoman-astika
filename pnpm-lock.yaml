@@ -48,7 +48,11 @@ importers:
         specifier: ^0.7.1
         version: 0.7.1
       cloudinary:
+<<<<<<< HEAD
+        specifier: ^2.8.0
+=======
         specifier: ^2.9.0
+>>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
         version: 2.9.0
       clsx:
         specifier: ^2.1.1
