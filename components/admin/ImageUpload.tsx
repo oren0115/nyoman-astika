@@ -13,8 +13,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {
-  value: string;
-  onChange: (url: string) => void;
+  value?: string;
+  onChange?: (url: string) => void;
+  values?: string[];
+  onMultipleChange?: (urls: string[]) => void;
+  multiple?: boolean;
+  maxFiles?: number;
   label?: string;
   aspectRatio?: "video" | "square";
 }
@@ -22,6 +26,10 @@ interface ImageUploadProps {
 export function ImageUpload({
   value,
   onChange,
+  values = [],
+  onMultipleChange,
+  multiple = false,
+  maxFiles = 10,
   label = "Cover Image",
   aspectRatio = "video",
 }: ImageUploadProps) {
@@ -30,13 +38,28 @@ export function ImageUpload({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
+  const currentValues = multiple ? values : value ? [value] : [];
+
   const upload = useCallback(
-    async (file: File) => {
+    async (selectedFiles: File[]) => {
+      if (selectedFiles.length === 0) return;
       setError("");
       setUploading(true);
       try {
         const formData = new FormData();
-        formData.append("file", file);
+        if (multiple) {
+          const remainingSlots = Math.max(maxFiles - currentValues.length, 0);
+          const filesToUpload = selectedFiles.slice(0, remainingSlots);
+          if (filesToUpload.length === 0) {
+            setError(`Maksimal ${maxFiles} foto.`);
+            return;
+          }
+          for (const file of filesToUpload) {
+            formData.append("files", file);
+          }
+        } else {
+          formData.append("file", selectedFiles[0]);
+        }
 
         const res = await fetch("/api/upload", { method: "POST", body: formData });
         const data = await res.json();
@@ -45,27 +68,37 @@ export function ImageUpload({
           setError(data.error ?? "Upload failed");
           return;
         }
-        onChange(data.url);
+
+        if (multiple) {
+          const uploadedUrls: string[] = Array.isArray(data.urls)
+            ? data.urls
+            : data.url
+              ? [data.url]
+              : [];
+          onMultipleChange?.([...currentValues, ...uploadedUrls]);
+        } else if (data.url) {
+          onChange?.(data.url);
+        }
       } catch {
         setError("Network error. Please try again.");
       } finally {
         setUploading(false);
       }
     },
-    [onChange],
+    [currentValues, maxFiles, multiple, onChange, onMultipleChange],
   );
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) upload(file);
+    const files = Array.from(e.target.files ?? []);
+    if (files.length > 0) upload(files);
     e.target.value = "";
   }
 
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     setDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) upload(file);
+    const files = Array.from(e.dataTransfer.files ?? []);
+    if (files.length > 0) upload(files);
   }
 
   function handleDragOver(e: React.DragEvent) {
@@ -81,7 +114,13 @@ export function ImageUpload({
 
   function handleRemove(e: React.MouseEvent) {
     e.stopPropagation();
-    onChange("");
+    onChange?.("");
+    setError("");
+  }
+
+  function handleRemoveAt(index: number) {
+    const next = currentValues.filter((_, i) => i !== index);
+    onMultipleChange?.(next);
     setError("");
   }
 
@@ -95,12 +134,85 @@ export function ImageUpload({
         ref={inputRef}
         type="file"
         accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+        multiple={multiple}
         onChange={handleFileChange}
         className="hidden"
         disabled={uploading}
       />
 
-      {value ? (
+      {multiple ? (
+        <div className="space-y-2">
+          {currentValues.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {currentValues.map((imageUrl, index) => (
+                <div
+                  key={`${imageUrl}-${index}`}
+                  className={cn("group relative overflow-hidden rounded-none border border-border bg-muted", aspectClass)}
+                >
+                  <Image
+                    src={imageUrl}
+                    alt={`Uploaded image ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    unoptimized={imageUrl.startsWith("/uploads/")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveAt(index)}
+                    className="absolute right-1 top-1 rounded-none border border-border bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                    aria-label={`Remove image ${index + 1}`}
+                    disabled={uploading}
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            disabled={uploading || currentValues.length >= maxFiles}
+            className={cn(
+              "flex w-full flex-col items-center justify-center gap-3 rounded-none border-2 border-dashed transition-colors",
+              aspectClass,
+              dragging
+                ? "border-primary bg-primary/5"
+                : "border-border bg-muted/30 hover:border-muted-foreground/40 hover:bg-muted/50",
+              (uploading || currentValues.length >= maxFiles) && "cursor-not-allowed opacity-60",
+            )}
+          >
+            {uploading ? (
+              <>
+                <CircleNotch className="size-6 animate-spin text-primary" />
+                <span className="text-xs text-muted-foreground">Uploading…</span>
+              </>
+            ) : (
+              <>
+                <div className="flex h-10 w-10 items-center justify-center rounded-none border border-border bg-background">
+                  {dragging ? (
+                    <UploadSimple className="size-5 text-primary" />
+                  ) : (
+                    <ImageIcon className="size-5 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="space-y-1 text-center">
+                  <p className="text-xs font-medium text-foreground">
+                    {dragging ? "Drop to upload" : "Click or drag & drop"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    JPG, PNG, WebP, GIF · max 5 MB · hingga {maxFiles} foto
+                  </p>
+                </div>
+              </>
+            )}
+          </button>
+        </div>
+      ) : value ? (
         /* Preview */
         <div className={cn("group relative overflow-hidden rounded-none border border-border bg-muted", aspectClass)}>
           <Image
