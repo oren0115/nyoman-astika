@@ -48,6 +48,8 @@ model Project {
   techStack   String[]      @default([])
   liveUrl     String?
   githubUrl   String?
+  /** Structured case study: hero meta, features, architecture, stats, timeline, etc. */
+  caseStudy   Json?
   featured    Boolean       @default(false)
   status      ProjectStatus @default(DRAFT)
   order       Int           @default(0)

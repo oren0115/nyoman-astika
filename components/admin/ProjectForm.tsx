@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Project } from "@prisma/client";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,17 @@ import { Separator } from "@/components/ui/separator";
 import { RichEditor } from "@/components/admin/RichEditor";
 import { TagInput } from "@/components/admin/TagInput";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { CaseStudyFields } from "@/components/admin/CaseStudyFields";
 import { slugify } from "@/lib/utils";
+import {
+  caseStudyToDraft,
+  draftToCaseStudyInput,
+  parseProjectCaseStudy,
+  serializeProjectCaseStudy,
+} from "@/lib/project-case-study";
 
-/** Setelah `prisma generate`, `images` ada di model Project dari Prisma. */
-type ProjectForForm = Project & { images?: string[] };
+/** Setelah `prisma generate`, `images` dan `caseStudy` ada di model Project dari Prisma. */
+type ProjectForForm = Project & { images?: string[]; caseStudy?: unknown };
 
 interface ProjectFormProps {
   project?: ProjectForForm;
@@ -50,6 +57,18 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
     project?.status ?? "DRAFT",
   );
   const [order, setOrder] = useState(project?.order ?? 0);
+  const [caseStudyDraft, setCaseStudyDraft] = useState(() =>
+    caseStudyToDraft(project?.caseStudy ?? null, project?.images?.length ?? (project?.coverImage ? 1 : 0)),
+  );
+
+  useEffect(() => {
+    setCaseStudyDraft((d) => {
+      const cap = [...d.imageCaptions];
+      while (cap.length < images.length) cap.push("");
+      if (cap.length > images.length) cap.length = images.length;
+      return { ...d, imageCaptions: cap };
+    });
+  }, [images.length]);
 
   function handleTitleChange(val: string) {
     setTitle(val);
@@ -63,6 +82,13 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
     setError("");
     setLoading(true);
 
+    const caseStudyInput = draftToCaseStudyInput(caseStudyDraft);
+    const existingCs = parseProjectCaseStudy(project?.caseStudy ?? null);
+    if (existingCs?.techGroups?.length && !caseStudyInput.techGroups) {
+      caseStudyInput.techGroups = existingCs.techGroups;
+    }
+    const caseStudySerialized = serializeProjectCaseStudy(caseStudyInput);
+
     const body = {
       title,
       slug,
@@ -75,6 +101,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
       featured,
       status,
       order,
+      caseStudy: caseStudySerialized === undefined ? null : caseStudySerialized,
     };
 
     try {
@@ -176,6 +203,12 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
       <p className="text-xs text-muted-foreground">
         Urutan pertama dipakai sebagai sampul di kartu daftar proyek. Anda bisa menambah beberapa foto.
       </p>
+
+      <CaseStudyFields
+        value={caseStudyDraft}
+        onChange={setCaseStudyDraft}
+        imageCount={images.length}
+      />
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-1.5">
