@@ -47,26 +47,18 @@ export function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-/** Split long descriptions into readable paragraphs for case-study layouts. */
-export function splitIntoParagraphs(text: string, softMax = 360): string[] {
-  const blocks = text.split(/\n\n+/).map((b) => b.trim()).filter(Boolean);
-  if (blocks.length > 1) return blocks;
+/**
+ * Memecah teks biasa (deskripsi, excerpt, dsb.) untuk tampilan publik:
+ * - Paragraf dipisah dengan satu atau lebih baris kosong (`\n\n+`).
+ * - Baris tunggal di dalam satu paragraf dipertahankan — render dengan `whitespace-pre-line` pada `<p>`.
+ * Tidak lagi memecah otomatis per kalimat (itu mengubah format dari input admin).
+ */
+export function splitIntoParagraphs(text: string): string[] {
+  const normalized = text.replace(/\r\n/g, "\n");
+  if (!normalized.trim()) return [];
 
-  const single = blocks[0] ?? text.trim();
-  if (single.length <= softMax) return single ? [single] : [];
-
-  const sentences = single.split(/(?<=[.!?])\s+/);
-  const out: string[] = [];
-  let buf = "";
-  for (const s of sentences) {
-    const next = buf ? `${buf} ${s}` : s;
-    if (next.length > softMax && buf) {
-      out.push(buf.trim());
-      buf = s;
-    } else {
-      buf = next;
-    }
-  }
-  if (buf.trim()) out.push(buf.trim());
-  return out;
+  return normalized
+    .split(/\n\n+/)
+    .map((block) => block.trimEnd())
+    .filter((block) => block.length > 0);
 }

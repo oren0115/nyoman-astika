@@ -5,22 +5,31 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import TextAlign from "@tiptap/extension-text-align";
+import { TextStyle, FontSize } from "@tiptap/extension-text-style";
 import {
   TextB,
   TextItalic,
   TextStrikethrough,
   ListBullets,
   ListNumbers,
-  TextHOne,
   TextHTwo,
+  TextHThree,
   Quotes,
   Code,
   LinkSimple,
   LinkBreak,
+  TextAlignLeft,
+  TextAlignCenter,
+  TextAlignRight,
+  TextAlignJustify,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+
+const FONT_SIZES = ["12px", "14px", "16px", "18px", "20px", "24px", "30px"] as const;
 
 interface RichEditorProps {
   value: string;
@@ -37,15 +46,24 @@ export function RichEditor({
 }: RichEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
+    shouldRerenderOnTransaction: true,
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: { levels: [2, 3] },
+      }),
+      TextStyle,
+      FontSize,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+        alignments: ["left", "center", "right", "justify"],
+      }),
       Image,
       Link.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder }),
     ],
     content: value,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+    onUpdate: ({ editor: ed }) => {
+      onChange(ed.getHTML());
     },
     editorProps: {
       attributes: {
@@ -69,86 +87,117 @@ export function RichEditor({
     );
   }
 
+  const ed = editor;
+
   function addLink() {
     const url = window.prompt("Enter URL");
     if (url) {
-      editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+      ed.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
     }
   }
 
+  const textStyleAttrs = ed.getAttributes("textStyle");
+  const currentFontSize =
+    typeof textStyleAttrs.fontSize === "string" ? textStyleAttrs.fontSize : "";
+  const fontSizeInPreset = FONT_SIZES.includes(
+    currentFontSize as (typeof FONT_SIZES)[number],
+  );
+
   const toolbarActions = [
     {
-      icon: TextHOne,
-      label: "H2",
-      action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-      active: editor.isActive("heading", { level: 2 }),
+      icon: TextHTwo,
+      label: "Heading 2",
+      action: () => ed.chain().focus().toggleHeading({ level: 2 }).run(),
+      active: ed.isActive("heading", { level: 2 }),
     },
     {
-      icon: TextHTwo,
-      label: "H3",
-      action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
-      active: editor.isActive("heading", { level: 3 }),
+      icon: TextHThree,
+      label: "Heading 3",
+      action: () => ed.chain().focus().toggleHeading({ level: 3 }).run(),
+      active: ed.isActive("heading", { level: 3 }),
     },
     {
       icon: TextB,
       label: "Bold",
-      action: () => editor.chain().focus().toggleBold().run(),
-      active: editor.isActive("bold"),
+      action: () => ed.chain().focus().toggleBold().run(),
+      active: ed.isActive("bold"),
     },
     {
       icon: TextItalic,
       label: "Italic",
-      action: () => editor.chain().focus().toggleItalic().run(),
-      active: editor.isActive("italic"),
+      action: () => ed.chain().focus().toggleItalic().run(),
+      active: ed.isActive("italic"),
     },
     {
       icon: TextStrikethrough,
       label: "Strike",
-      action: () => editor.chain().focus().toggleStrike().run(),
-      active: editor.isActive("strike"),
+      action: () => ed.chain().focus().toggleStrike().run(),
+      active: ed.isActive("strike"),
     },
     {
       icon: ListBullets,
       label: "Bullet list",
-      action: () => editor.chain().focus().toggleBulletList().run(),
-      active: editor.isActive("bulletList"),
+      action: () => ed.chain().focus().toggleBulletList().run(),
+      active: ed.isActive("bulletList"),
     },
     {
       icon: ListNumbers,
       label: "Ordered list",
-      action: () => editor.chain().focus().toggleOrderedList().run(),
-      active: editor.isActive("orderedList"),
+      action: () => ed.chain().focus().toggleOrderedList().run(),
+      active: ed.isActive("orderedList"),
     },
     {
       icon: Quotes,
       label: "Blockquote",
-      action: () => editor.chain().focus().toggleBlockquote().run(),
-      active: editor.isActive("blockquote"),
+      action: () => ed.chain().focus().toggleBlockquote().run(),
+      active: ed.isActive("blockquote"),
     },
     {
       icon: Code,
       label: "Code",
-      action: () => editor.chain().focus().toggleCode().run(),
-      active: editor.isActive("code"),
+      action: () => ed.chain().focus().toggleCode().run(),
+      active: ed.isActive("code"),
     },
     {
       icon: LinkSimple,
       label: "Add link",
       action: addLink,
-      active: editor.isActive("link"),
+      active: ed.isActive("link"),
     },
     {
       icon: LinkBreak,
       label: "Remove link",
-      action: () => editor.chain().focus().unsetLink().run(),
+      action: () => ed.chain().focus().unsetLink().run(),
       active: false,
+    },
+  ];
+
+  const alignActions = [
+    {
+      icon: TextAlignLeft,
+      label: "Align left",
+      align: "left" as const,
+    },
+    {
+      icon: TextAlignCenter,
+      label: "Align center",
+      align: "center" as const,
+    },
+    {
+      icon: TextAlignRight,
+      label: "Align right",
+      align: "right" as const,
+    },
+    {
+      icon: TextAlignJustify,
+      label: "Justify",
+      align: "justify" as const,
     },
   ];
 
   return (
     <div className={cn("rounded-none border border-border bg-background", className)}>
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 border-b border-border p-1.5">
+      <div className="flex flex-wrap items-center gap-1 border-b border-border p-1.5">
         {toolbarActions.map(({ icon: Icon, label, action, active }, i) => (
           <Button
             key={i}
@@ -163,13 +212,63 @@ export function RichEditor({
             <Icon />
           </Button>
         ))}
+
+        <Separator orientation="vertical" className="mx-1 h-4" />
+
+        <div className="flex items-center gap-1.5 px-1">
+          <Label htmlFor="editor-font-size" className="sr-only">
+            Ukuran font
+          </Label>
+          <select
+            id="editor-font-size"
+            className="h-7 max-w-[5.5rem] cursor-pointer rounded-none border border-border bg-background px-1.5 text-xs text-foreground"
+            value={currentFontSize || ""}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (!v) {
+                ed.chain().focus().unsetFontSize().run();
+              } else {
+                ed.chain().focus().setFontSize(v).run();
+              }
+            }}
+            title="Ukuran font"
+          >
+            <option value="">Size</option>
+            {!fontSizeInPreset && currentFontSize ? (
+              <option value={currentFontSize}>{currentFontSize}</option>
+            ) : null}
+            {FONT_SIZES.map((px) => (
+              <option key={px} value={px}>
+                {px}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <Separator orientation="vertical" className="mx-1 h-4" />
+
+        {alignActions.map(({ icon: Icon, label, align }) => (
+          <Button
+            key={align}
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            onClick={() => ed.chain().focus().setTextAlign(align).run()}
+            className={cn(ed.isActive({ textAlign: align }) && "bg-muted text-foreground")}
+            aria-label={label}
+            title={label}
+          >
+            <Icon />
+          </Button>
+        ))}
+
         <Separator orientation="vertical" className="mx-1 h-4" />
         <Button
           type="button"
           variant="ghost"
           size="xs"
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().undo()}
+          onClick={() => ed.chain().focus().undo().run()}
+          disabled={!ed.can().undo()}
         >
           Undo
         </Button>
@@ -177,15 +276,14 @@ export function RichEditor({
           type="button"
           variant="ghost"
           size="xs"
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
+          onClick={() => ed.chain().focus().redo().run()}
+          disabled={!ed.can().redo()}
         >
           Redo
         </Button>
       </div>
 
-      {/* Editor */}
-      <EditorContent editor={editor} />
+      <EditorContent editor={ed} />
     </div>
   );
 }

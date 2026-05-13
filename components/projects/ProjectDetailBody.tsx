@@ -253,7 +253,9 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
           <DetailSection id="overview" title="Overview" kicker="Summary">
             <div className="max-w-2xl space-y-5 text-sm leading-[1.75] text-muted-foreground sm:text-[15px] sm:leading-[1.8]">
               {overviewParagraphs.map((p, i) => (
-                <p key={i}>{p}</p>
+                <p key={i} className="whitespace-pre-line">
+                  {p}
+                </p>
               ))}
             </div>
           </DetailSection>
@@ -266,7 +268,7 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
                     <h3 className="mb-3 text-xs font-semibold tracking-wide text-foreground uppercase">
                       Problem
                     </h3>
-                    <p className="text-sm leading-[1.75] text-muted-foreground sm:text-[15px] sm:leading-[1.8]">
+                    <p className="whitespace-pre-line text-sm leading-[1.75] text-muted-foreground sm:text-[15px] sm:leading-[1.8]">
                       {cs.problem}
                     </p>
                   </div>
@@ -276,7 +278,7 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
                     <h3 className="mb-3 text-xs font-semibold tracking-wide text-foreground uppercase">
                       Solution
                     </h3>
-                    <p className="text-sm leading-[1.75] text-muted-foreground sm:text-[15px] sm:leading-[1.8]">
+                    <p className="whitespace-pre-line text-sm leading-[1.75] text-muted-foreground sm:text-[15px] sm:leading-[1.8]">
                       {cs.solution}
                     </p>
                   </div>
@@ -304,7 +306,7 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
                       <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
                         {row.label}
                       </p>
-                      <p className="mt-2 font-mono text-sm font-semibold tracking-tight text-foreground">
+                      <p className="mt-2 whitespace-pre-line font-mono text-sm font-semibold tracking-tight text-foreground">
                         {row.value}
                       </p>
                     </CardContent>
@@ -323,7 +325,7 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
                     className="flex gap-3 rounded-xl border border-border/60 bg-muted/20 px-4 py-3 text-sm text-foreground/90 transition-colors hover:border-primary/25 hover:bg-muted/35"
                   >
                     <Lightning className="mt-0.5 size-4 shrink-0 text-primary" weight="duotone" aria-hidden />
-                    <span className="leading-relaxed">{f}</span>
+                    <span className="whitespace-pre-line leading-relaxed">{f}</span>
                   </li>
                 ))}
               </ul>
@@ -341,7 +343,7 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
               <div className="max-w-xl rounded-xl border border-border/60 bg-muted/15 px-6 py-8 font-mono text-sm leading-relaxed text-foreground/90">
                 {cs.architectureSteps.map((step, i) => (
                   <div key={`${step}-${i}`} className="flex flex-col items-center gap-1">
-                    <span className="text-center">{step}</span>
+                    <span className="whitespace-pre-line text-center">{step}</span>
                     {i < cs.architectureSteps!.length - 1 ? (
                       <span className="my-1 text-lg text-primary/70" aria-hidden>
                         ↓
@@ -357,7 +359,7 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
             <DetailSection id="challenges" title="Technical challenges" kicker="Problem solving">
               <ul className="max-w-2xl space-y-3 border-l-2 border-primary/35 pl-5">
                 {cs.challenges.map((c) => (
-                  <li key={c} className="text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
+                  <li key={c} className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
                     {c}
                   </li>
                 ))}
@@ -375,7 +377,7 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
                       weight="fill"
                       aria-hidden
                     />
-                    <span className="text-foreground/90">{line}</span>
+                    <span className="whitespace-pre-line text-foreground/90">{line}</span>
                   </li>
                 ))}
               </ul>
@@ -402,7 +404,7 @@ export function ProjectDetailBody({ project }: { project: ProjectDetailRecord })
           {project.content?.trim() ? (
             <DetailSection id="write-up" title="Deep dive" kicker="Notes">
               <div
-                className="prose prose-sm max-w-2xl dark:prose-invert prose-p:leading-[1.75] prose-headings:tracking-tight prose-h2:text-lg prose-h2:font-semibold prose-h3:text-base prose-h3:font-semibold [&>p]:text-muted-foreground [&>ul]:text-muted-foreground [&>ol]:text-muted-foreground"
+                className="prose prose-sm max-w-2xl dark:prose-invert prose-p:my-3 prose-p:leading-[1.75] prose-headings:scroll-mt-28 prose-headings:tracking-tight prose-h2:mt-10 prose-h2:mb-3 prose-h2:text-lg prose-h2:font-semibold prose-h3:mt-8 prose-h3:mb-2 prose-h3:text-base prose-h3:font-semibold prose-li:my-1 prose-ul:my-3 prose-ol:my-3 [&_h1]:mt-12 [&_h1]:mb-4 [&_h1]:text-2xl [&_h1]:font-semibold [&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:text-lg [&_h2]:font-semibold [&_h3]:mt-8 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_li>p]:my-0 [&_li]:text-muted-foreground [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:text-muted-foreground [&_p]:text-muted-foreground [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:text-muted-foreground [&_blockquote]:text-muted-foreground"
                 dangerouslySetInnerHTML={{ __html: project.content }}
               />
             </DetailSection>
