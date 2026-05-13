@@ -8,7 +8,7 @@ export default function NewExperiencePage() {
   return (
     <div>
       <AdminHeader title="Add Experience" description="Add a new work experience entry." />
-      <div className="p-6 max-w-2xl">
+      <div className="w-full max-w-none p-6 lg:px-8 xl:px-10">
         <ExperienceForm mode="create" />
       </div>
     </div>

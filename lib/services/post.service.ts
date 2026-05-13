@@ -46,17 +46,35 @@ export async function getPostById(id: string) {
 }
 
 export async function createPost(data: PostInput) {
+  const { images, coverImage, publishedAt, ...rest } = data;
+  const gallery =
+    images.length > 0 ? images : coverImage ? [coverImage] : [];
   return prisma.post.create({
     data: {
-      ...data,
+      ...rest,
+      images: gallery,
+      coverImage: gallery[0] ?? null,
       publishedAt:
-        data.status === "PUBLISHED" ? (data.publishedAt ? new Date(data.publishedAt) : new Date()) : null,
+        data.status === "PUBLISHED"
+          ? publishedAt
+            ? new Date(publishedAt)
+            : new Date()
+          : null,
     },
   });
 }
 
 export async function updatePost(id: string, data: PostUpdateInput) {
-  const updateData: Record<string, unknown> = { ...data };
+  const { images, coverImage, ...rest } = data;
+  const updateData: Record<string, unknown> = { ...rest };
+
+  if (images !== undefined || coverImage !== undefined) {
+    const gallery =
+      images !== undefined ? images : coverImage ? [coverImage] : [];
+    updateData.images = gallery;
+    updateData.coverImage = gallery[0] ?? null;
+  }
+
   if (data.status === "PUBLISHED" && data.publishedAt === undefined) {
     updateData.publishedAt = new Date();
   }

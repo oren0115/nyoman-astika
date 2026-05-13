@@ -11,7 +11,7 @@ export default function NewPostPage() {
         title="New Blog Post"
         description="Write and publish a new post."
       />
-      <div className="p-6 max-w-3xl">
+      <div className="w-full max-w-none p-6 lg:px-8 xl:px-10">
         <PostForm mode="create" />
       </div>
     </div>

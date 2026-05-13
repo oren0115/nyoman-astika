@@ -24,7 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: post.title,
       description: post.excerpt,
-      images: post.coverImage ? [post.coverImage] : [],
+      images:
+        post.images && post.images.length > 0
+          ? post.images
+          : post.coverImage
+            ? [post.coverImage]
+            : [],
     },
   };
 }
@@ -43,6 +48,13 @@ export default async function BlogDetailPage({ params }: Props) {
   if (!post || post.status !== "PUBLISHED") {
     notFound();
   }
+
+  const gallery =
+    post.images && post.images.length > 0
+      ? post.images
+      : post.coverImage
+        ? [post.coverImage]
+        : [];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
@@ -87,15 +99,22 @@ export default async function BlogDetailPage({ params }: Props) {
           )}
         </header>
 
-        {post.coverImage && (
-          <div className="relative mb-8 aspect-video overflow-hidden rounded-none border border-border bg-muted">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              className="object-cover"
-              priority
-            />
+        {gallery.length > 0 && (
+          <div className="mb-8 space-y-4">
+            {gallery.map((src, index) => (
+              <div
+                key={`${src}-${index}`}
+                className="relative aspect-video overflow-hidden rounded-none border border-border bg-muted"
+              >
+                <Image
+                  src={src}
+                  alt={index === 0 ? post.title : `${post.title} — ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                />
+              </div>
+            ))}
           </div>
         )}
 

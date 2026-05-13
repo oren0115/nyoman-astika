@@ -17,6 +17,14 @@ export const projectSchema = z.object({
       message: "Must be a valid URL or uploaded path",
     })
     .optional(),
+  images: z
+    .array(
+      z.string().refine((v) => v.startsWith("/") || v.startsWith("http"), {
+        message: "Must be a valid URL or uploaded path",
+      }),
+    )
+    .max(10)
+    .default([]),
   techStack: z.array(z.string()).default([]),
   liveUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   githubUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),

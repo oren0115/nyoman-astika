@@ -20,8 +20,11 @@ import { TagInput } from "@/components/admin/TagInput";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { slugify } from "@/lib/utils";
 
+/** Setelah `prisma generate`, `images` ada di model Post dari Prisma. */
+type PostForForm = Post & { images?: string[] };
+
 interface PostFormProps {
-  post?: Post;
+  post?: PostForForm;
   mode: "create" | "edit";
 }
 
@@ -34,7 +37,11 @@ export function PostForm({ post, mode }: PostFormProps) {
   const [slug, setSlug] = useState(post?.slug ?? "");
   const [excerpt, setExcerpt] = useState(post?.excerpt ?? "");
   const [content, setContent] = useState(post?.content ?? "");
-  const [coverImage, setCoverImage] = useState(post?.coverImage ?? "");
+  const [images, setImages] = useState<string[]>(() => {
+    if (post?.images?.length) return post.images;
+    if (post?.coverImage) return [post.coverImage];
+    return [];
+  });
   const [tags, setTags] = useState<string[]>(post?.tags ?? []);
   const [featured, setFeatured] = useState(post?.featured ?? false);
   const [status, setStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">(
@@ -58,7 +65,7 @@ export function PostForm({ post, mode }: PostFormProps) {
       slug,
       excerpt,
       content,
-      coverImage: coverImage || undefined,
+      images,
       tags,
       featured,
       status,
@@ -155,7 +162,15 @@ export function PostForm({ post, mode }: PostFormProps) {
 
       <Separator />
 
-      <ImageUpload value={coverImage} onChange={setCoverImage} label="Cover Image" />
+      <ImageUpload
+        multiple
+        values={images}
+        onMultipleChange={setImages}
+        label="Gambar artikel"
+      />
+      <p className="text-xs text-muted-foreground">
+        Foto pertama dipakai sebagai sampul di daftar blog. Anda bisa mengunggah beberapa gambar sekaligus.
+      </p>
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-1.5">
@@ -203,12 +218,13 @@ export function PostForm({ post, mode }: PostFormProps) {
           type="button"
           variant="outline"
           size="sm"
+          className="cursor-pointer"
           onClick={() => router.back()}
           disabled={loading}
         >
           Cancel
         </Button>
-        <Button type="submit" size="sm" disabled={loading}>
+        <Button type="submit" size="sm" className="cursor-pointer" disabled={loading}>
           {loading
             ? mode === "create"
               ? "Publishing…"

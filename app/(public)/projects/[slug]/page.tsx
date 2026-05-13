@@ -24,7 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: project.title,
       description: project.description,
-      images: project.coverImage ? [project.coverImage] : [],
+      images:
+        project.images && project.images.length > 0
+          ? project.images
+          : project.coverImage
+            ? [project.coverImage]
+            : [],
     },
   };
 }
@@ -44,14 +49,15 @@ export default async function ProjectDetailPage({ params }: Props) {
     notFound();
   }
 
+  const gallery =
+    project.images && project.images.length > 0
+      ? project.images
+      : project.coverImage
+        ? [project.coverImage]
+        : [];
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
-      <Button asChild variant="ghost" size="sm" className="mb-8 -ml-2">
-        <Link href="/projects">
-          <ArrowLeft /> Back to projects
-        </Link>
-      </Button>
-
       <article>
         <header className="mb-8">
           <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -101,15 +107,22 @@ export default async function ProjectDetailPage({ params }: Props) {
           </div>
         </header>
 
-        {project.coverImage && (
-          <div className="relative mb-8 aspect-video overflow-hidden rounded-none border border-border bg-muted">
-            <Image
-              src={project.coverImage}
-              alt={project.title}
-              fill
-              className="object-cover"
-              priority
-            />
+        {gallery.length > 0 && (
+          <div className="mb-8 space-y-4">
+            {gallery.map((src, index) => (
+              <div
+                key={`${src}-${index}`}
+                className="relative aspect-video overflow-hidden rounded-none border border-border bg-muted"
+              >
+                <Image
+                  src={src}
+                  alt={index === 0 ? project.title : `${project.title} — ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                />
+              </div>
+            ))}
           </div>
         )}
 

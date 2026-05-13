@@ -141,9 +141,9 @@ export function ImageUpload({
       />
 
       {multiple ? (
-        <div className="space-y-2">
+        <div className="min-h-0 space-y-2">
           {currentValues.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <div className="grid min-h-0 grid-cols-2 gap-2 sm:grid-cols-3">
               {currentValues.map((imageUrl, index) => (
                 <div
                   key={`${imageUrl}-${index}`}
@@ -178,7 +178,7 @@ export function ImageUpload({
             onDragLeave={handleDragLeave}
             disabled={uploading || currentValues.length >= maxFiles}
             className={cn(
-              "flex w-full flex-col items-center justify-center gap-3 rounded-none border-2 border-dashed transition-colors",
+              "flex w-full shrink-0 flex-col items-center justify-center gap-3 rounded-none border-2 border-dashed transition-colors",
               aspectClass,
               dragging
                 ? "border-primary bg-primary/5"
@@ -260,7 +260,7 @@ export function ImageUpload({
           onDragLeave={handleDragLeave}
           disabled={uploading}
           className={cn(
-            "flex w-full flex-col items-center justify-center gap-3 rounded-none border-2 border-dashed transition-colors",
+            "flex w-full shrink-0 flex-col items-center justify-center gap-3 rounded-none border-2 border-dashed transition-colors",
             aspectClass,
             dragging
               ? "border-primary bg-primary/5"

@@ -44,6 +44,7 @@ model Project {
   description String
   content     String?
   coverImage  String?
+  images      String[]      @default([])
   techStack   String[]      @default([])
   liveUrl     String?
   githubUrl   String?
@@ -93,6 +94,7 @@ model Post {
   excerpt     String
   content     String
   coverImage  String?
+  images      String[]   @default([])
   tags        String[]   @default([])
   featured    Boolean    @default(false)
   status      PostStatus @default(DRAFT)

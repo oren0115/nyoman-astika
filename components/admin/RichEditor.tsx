@@ -55,7 +55,19 @@ export function RichEditor({
     },
   });
 
-  if (!editor) return null;
+  if (!editor) {
+    return (
+      <div
+        className={cn(
+          "rounded-none border border-border bg-muted/30 px-3 py-8 text-center text-xs text-muted-foreground",
+          className,
+        )}
+        aria-busy
+      >
+        Memuat editor…
+      </div>
+    );
+  }
 
   function addLink() {
     const url = window.prompt("Enter URL");

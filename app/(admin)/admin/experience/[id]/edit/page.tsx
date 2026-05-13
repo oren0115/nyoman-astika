@@ -19,7 +19,7 @@ export default async function EditExperiencePage({ params }: Props) {
         title={`Edit: ${experience.role}`}
         description={experience.company}
       />
-      <div className="p-6 max-w-2xl">
+      <div className="w-full max-w-none p-6 lg:px-8 xl:px-10">
         <ExperienceForm experience={experience} mode="edit" />
       </div>
     </div>

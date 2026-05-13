@@ -11,7 +11,7 @@ export default function NewProjectPage() {
         title="New Project"
         description="Add a new project to your portfolio."
       />
-      <div className="p-6 max-w-3xl">
+      <div className="w-full max-w-none p-6 lg:px-8 xl:px-10">
         <ProjectForm mode="create" />
       </div>
     </div>

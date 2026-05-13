@@ -17,6 +17,14 @@ export const postSchema = z.object({
       message: "Must be a valid URL or uploaded path",
     })
     .optional(),
+  images: z
+    .array(
+      z.string().refine((v) => v.startsWith("/") || v.startsWith("http"), {
+        message: "Must be a valid URL or uploaded path",
+      }),
+    )
+    .max(10)
+    .default([]),
   tags: z.array(z.string()).default([]),
   featured: z.boolean().default(false),
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),

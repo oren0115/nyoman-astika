@@ -26,7 +26,7 @@ export default async function EditProjectPage({ params }: Props) {
         title={`Edit: ${project.title}`}
         description="Update project details."
       />
-      <div className="p-6 max-w-3xl">
+      <div className="w-full max-w-none p-6 lg:px-8 xl:px-10">
         <ProjectForm project={project} mode="edit" />
       </div>
     </div>

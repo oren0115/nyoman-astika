@@ -20,8 +20,11 @@ import { TagInput } from "@/components/admin/TagInput";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { slugify } from "@/lib/utils";
 
+/** Setelah `prisma generate`, `images` ada di model Project dari Prisma. */
+type ProjectForForm = Project & { images?: string[] };
+
 interface ProjectFormProps {
-  project?: Project;
+  project?: ProjectForForm;
   mode: "create" | "edit";
 }
 
@@ -34,7 +37,11 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
   const [slug, setSlug] = useState(project?.slug ?? "");
   const [description, setDescription] = useState(project?.description ?? "");
   const [content, setContent] = useState(project?.content ?? "");
-  const [coverImage, setCoverImage] = useState(project?.coverImage ?? "");
+  const [images, setImages] = useState<string[]>(() => {
+    if (project?.images?.length) return project.images;
+    if (project?.coverImage) return [project.coverImage];
+    return [];
+  });
   const [techStack, setTechStack] = useState<string[]>(project?.techStack ?? []);
   const [liveUrl, setLiveUrl] = useState(project?.liveUrl ?? "");
   const [githubUrl, setGithubUrl] = useState(project?.githubUrl ?? "");
@@ -61,7 +68,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
       slug,
       description,
       content: content || undefined,
-      coverImage: coverImage || undefined,
+      images,
       techStack,
       liveUrl: liveUrl || undefined,
       githubUrl: githubUrl || undefined,
@@ -160,7 +167,15 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
 
       <Separator />
 
-      <ImageUpload value={coverImage} onChange={setCoverImage} label="Cover Image" />
+      <ImageUpload
+        multiple
+        values={images}
+        onMultipleChange={setImages}
+        label="Gambar proyek"
+      />
+      <p className="text-xs text-muted-foreground">
+        Urutan pertama dipakai sebagai sampul di kartu daftar proyek. Anda bisa menambah beberapa foto.
+      </p>
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-1.5">

@@ -44,11 +44,30 @@ export async function getProjectById(id: string) {
 }
 
 export async function createProject(data: ProjectInput) {
-  return prisma.project.create({ data });
+  const { images, coverImage, ...rest } = data;
+  const gallery =
+    images.length > 0 ? images : coverImage ? [coverImage] : [];
+  return prisma.project.create({
+    data: {
+      ...rest,
+      images: gallery,
+      coverImage: gallery[0] ?? null,
+    },
+  });
 }
 
 export async function updateProject(id: string, data: ProjectUpdateInput) {
-  return prisma.project.update({ where: { id }, data });
+  const { images, coverImage, ...rest } = data;
+  const patch: Record<string, unknown> = { ...rest };
+
+  if (images !== undefined || coverImage !== undefined) {
+    const gallery =
+      images !== undefined ? images : coverImage ? [coverImage] : [];
+    patch.images = gallery;
+    patch.coverImage = gallery[0] ?? null;
+  }
+
+  return prisma.project.update({ where: { id }, data: patch });
 }
 
 export async function deleteProject(id: string) {

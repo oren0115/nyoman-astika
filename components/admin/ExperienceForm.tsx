@@ -176,10 +176,10 @@ export function ExperienceForm({ experience, mode }: ExperienceFormProps) {
       />
 
       <div className="flex items-center justify-end gap-3 pt-2">
-        <Button type="button" variant="outline" size="sm" onClick={() => router.back()} disabled={loading}>
+        <Button type="button" className="cursor-pointer" variant="outline" size="sm" onClick={() => router.back()} disabled={loading}>
           Cancel
         </Button>
-        <Button type="submit" size="sm" disabled={loading}>
+        <Button type="submit" size="sm" className="cursor-pointer" disabled={loading}>
           {loading
             ? mode === "create" ? "Creating…" : "Saving…"
             : mode === "create" ? "Add Experience" : "Save Changes"}

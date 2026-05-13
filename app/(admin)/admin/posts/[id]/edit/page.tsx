@@ -26,7 +26,7 @@ export default async function EditPostPage({ params }: Props) {
         title={`Edit: ${post.title}`}
         description="Update post content and settings."
       />
-      <div className="p-6 max-w-3xl">
+      <div className="w-full max-w-none p-6 lg:px-8 xl:px-10">
         <PostForm post={post} mode="edit" />
       </div>
     </div>
