@@ -145,7 +145,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<div className="min-h-screen bg-background" aria-hidden />}>
       <LoginForm />
     </Suspense>
   );
