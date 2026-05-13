@@ -20,6 +20,7 @@
 /build
 /prisma/migrations
 /prisma/migrations/migrations_lock.toml
+ca.pem
 
 # misc
 .DS_Store

@@ -3,7 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -24,7 +25,7 @@ enum PostStatus {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String   @unique
   password  String
@@ -37,11 +38,11 @@ model User {
 }
 
 model Project {
-  id          String        @id @default(uuid())
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   slug        String        @unique
   description String
-  content     String?       @db.Text
+  content     String?
   coverImage  String?
   techStack   String[]      @default([])
   liveUrl     String?
@@ -56,7 +57,7 @@ model Project {
 }
 
 model Experience {
-  id          String    @id @default(uuid())
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   company     String
   role        String
   location    String?
@@ -64,7 +65,7 @@ model Experience {
   startDate   DateTime
   endDate     DateTime?
   current     Boolean   @default(false)
-  description String    @db.Text
+  description String
   skills      String[]  @default([])
   order       Int       @default(0)
   createdAt   DateTime  @default(now())
@@ -74,11 +75,11 @@ model Experience {
 }
 
 model ContactMessage {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String
   subject   String?
-  message   String   @db.Text
+  message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
@@ -86,11 +87,11 @@ model ContactMessage {
 }
 
 model Post {
-  id          String     @id @default(uuid())
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   slug        String     @unique
   excerpt     String
-  content     String     @db.Text
+  content     String
   coverImage  String?
   tags        String[]   @default([])
   featured    Boolean    @default(false)

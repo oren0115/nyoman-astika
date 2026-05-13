@@ -1,17 +1,13 @@
 # Nyoman Astika — Portfolio
 
-A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, **Prisma**, **PostgreSQL**, and **Tailwind CSS v4**.
+A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, **Prisma 6**, **MongoDB**, and **Tailwind CSS v4**.
 
 ## Features
 
 - **Public portfolio** — home, projects, blog, experience, and contact pages
 - **Admin CMS** — manage projects, posts, experience entries, and contact messages
 - **Rich text editor** — Tiptap-powered editor for blog posts and project content
-<<<<<<< HEAD
-- **Image uploads** — Cloudinary
-=======
-- **Image uploads** — Cloudinary when configured, otherwise local `public/uploads` in development
->>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
+- **Image uploads** — Cloudinary (admin uploads; configure env in production)
 - **Dark / light mode** — system-aware theme toggle
 - **Type-safe** — end-to-end TypeScript with Prisma-generated types
 
@@ -21,16 +17,12 @@ A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, 
 |---|---|
 | Framework | Next.js 16 (App Router, Turbopack) |
 | Language | TypeScript |
-| Database | PostgreSQL (Neon / Supabase / local) |
-| ORM | Prisma 7 with `@prisma/adapter-pg` |
+| Database | MongoDB (Atlas or self-hosted) |
+| ORM | Prisma 6.19 + MongoDB (Prisma 7 requires SQL driver adapters; use v6 for Mongo until [supported](https://www.prisma.io/docs/orm/overview/databases/mongodb)) |
 | Styling | Tailwind CSS v4 |
 | UI Components | shadcn/ui + Radix UI |
 | Auth | JWT via `jose` |
-<<<<<<< HEAD
 | Storage | Cloudinary |
-=======
-| Storage | Cloudinary (when env set) / local `public/uploads` |
->>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
 | Fonts | Geist Sans, Geist Mono, JetBrains Mono (self-hosted) |
 | Deployment | Vercel |
 
@@ -40,7 +32,7 @@ A full-stack personal portfolio with a built-in CMS, built with **Next.js 16**, 
 
 - Node.js 20+
 - pnpm (`npm install -g pnpm`)
-- PostgreSQL database (local or cloud)
+- MongoDB database ([MongoDB Atlas](https://www.mongodb.com/atlas) free tier works well)
 
 ### 1. Clone and install
 
@@ -61,13 +53,15 @@ cp .env.example .env
 Edit `.env` and fill in the required values:
 
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/portfolio_db"
+DATABASE_URL="mongodb+srv://user:password@cluster.mongodb.net/portfolio?retryWrites=true&w=majority"
 JWT_SECRET="your-random-32-char-secret"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 CLOUDINARY_URL="cloudinary://API_KEY:API_SECRET@CLOUD_NAME"
 ```
 
 Or set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` instead of `CLOUDINARY_URL`. Get these from the [Cloudinary Console](https://console.cloudinary.com/) → **Dashboard** / **API Keys**.
+
+`DATABASE_URL` must include the **MongoDB database name in the path** (e.g. `...mongodb.net/portfolio?...`). If the URI goes from the host straight to `?` without `/dbname`, Prisma returns **P1013**.
 
 Generate a secure `JWT_SECRET`:
 ```bash
@@ -81,7 +75,9 @@ Push the schema to your database:
 pnpm db:push
 ```
 
-Seed with sample data (optional):
+> **MongoDB:** Prisma **Migrate** (`prisma migrate dev`, `migrate deploy`, …) is **not supported** for the `mongodb` provider. Use **`pnpm db:push`** to apply schema changes ([Prisma + MongoDB](https://www.prisma.io/docs/orm/overview/databases/mongodb)).
+
+Create the default admin user (optional):
 ```bash
 pnpm db:seed
 ```
@@ -121,7 +117,7 @@ portfolio/
 │   └── site-config.ts    # Site metadata (name, links, etc.)
 ├── prisma/
 │   ├── schema.prisma     # Database schema
-│   └── seed.ts           # Sample data seed
+│   └── seed.ts           # Default admin user
 └── public/
     └── fonts/            # Self-hosted Geist + JetBrains Mono fonts
 ```
@@ -132,9 +128,12 @@ portfolio/
 |---|---|
 | `pnpm db:generate` | Regenerate Prisma client after schema changes |
 | `pnpm db:push` | Push schema changes to the database (no migration files) |
-| `pnpm db:migrate` | Create a migration file and apply it |
-| `pnpm db:seed` | Seed the database with sample data |
+| `pnpm db:migrate` | Same as `db:push` — use this instead of `prisma migrate dev` |
+| `pnpm migrate:dev` | Fails with a hint (MongoDB does not support Prisma Migrate) |
+| `pnpm db:seed` | Create the default admin user if missing |
 | `pnpm db:studio` | Open Prisma Studio (visual database browser) |
+
+> Do **not** run `pnpm prisma migrate dev` against MongoDB; Prisma will error by design.
 
 > Run `pnpm db:generate` any time you change `prisma/schema.prisma`.
 
@@ -150,11 +149,7 @@ Go to [vercel.com/new](https://vercel.com/new), import your GitHub repository.
 
 ### 3. Cloudinary (image storage)
 
-<<<<<<< HEAD
-Create a free account at [cloudinary.com](https://cloudinary.com), then in **Programmable Media** → **Dashboard** copy **API Environment variable** (`CLOUDINARY_URL`) or the separate cloud name, API key, and API secret.
-=======
-Create a free account at [cloudinary.com](https://cloudinary.com), open the **Dashboard**, and copy **Cloud name**, **API Key**, and **API Secret** into your Vercel environment variables (see below). Uploaded images are stored under the folder `portfolio/uploads`.
->>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
+Create a free account at [cloudinary.com](https://cloudinary.com). In the **Dashboard**, use **API Environment variable** (`CLOUDINARY_URL`) or set **Cloud name**, **API Key**, and **API Secret** in Vercel (see below). Uploaded images go to the folder `portfolio/uploads`.
 
 ### 4. Set environment variables
 
@@ -162,16 +157,13 @@ In **Settings → Environment Variables**, add:
 
 | Variable | Value |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string with `?sslmode=verify-full` |
+| `DATABASE_URL` | MongoDB URI including **database name in the path** (e.g. `...mongodb.net/portfolio?...`) — required by Prisma ([P1013](https://www.prisma.io/docs/orm/reference/error-reference#p1013) if missing) |
 | `JWT_SECRET` | Random 32+ character string |
 | `NEXT_PUBLIC_APP_URL` | `https://your-project.vercel.app` |
-<<<<<<< HEAD
-| `CLOUDINARY_URL` | From Cloudinary dashboard (or the three `CLOUDINARY_*` vars) |
-=======
-| `CLOUDINARY_CLOUD_NAME` | From Cloudinary dashboard |
-| `CLOUDINARY_API_KEY` | From Cloudinary dashboard |
-| `CLOUDINARY_API_SECRET` | From Cloudinary dashboard |
->>>>>>> 07cf2d6e38a0cdfdd91117dcaebdddf6d22fe4d4
+| `CLOUDINARY_URL` | Optional single var from Cloudinary dashboard |
+| `CLOUDINARY_CLOUD_NAME` | If not using `CLOUDINARY_URL` |
+| `CLOUDINARY_API_KEY` | If not using `CLOUDINARY_URL` |
+| `CLOUDINARY_API_SECRET` | If not using `CLOUDINARY_URL` |
 
 ### 5. Deploy
 

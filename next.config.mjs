@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ["cloudinary"],
   images: {
     localPatterns: [{ pathname: "/uploads/**" }],
     remotePatterns: [

@@ -18,10 +18,7 @@ export async function getProjects(filters: ProjectFilters = {}) {
     ...(status && { status }),
     ...(featured !== undefined && { featured }),
     ...(search && {
-      OR: [
-        { title: { contains: search, mode: "insensitive" as const } },
-        { description: { contains: search, mode: "insensitive" as const } },
-      ],
+      OR: [{ title: { contains: search } }, { description: { contains: search } }],
     }),
   };
 

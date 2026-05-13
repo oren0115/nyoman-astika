@@ -20,10 +20,7 @@ export async function getPosts(filters: PostFilters = {}) {
     ...(featured !== undefined && { featured }),
     ...(tag && { tags: { has: tag } }),
     ...(search && {
-      OR: [
-        { title: { contains: search, mode: "insensitive" as const } },
-        { excerpt: { contains: search, mode: "insensitive" as const } },
-      ],
+      OR: [{ title: { contains: search } }, { excerpt: { contains: search } }],
     }),
   };
 
